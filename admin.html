@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Items Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .add-section {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .search-section {
+            padding: 30px;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 20px;
+        }
+
+        .items-section {
+            padding: 30px;
+            background: white;
+        }
+
+        .not-found {
+            text-align: center;
+            color: #dc3545;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8d7da;
+            border-radius: 10px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .item-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #e9ecef;
+            position: relative;
+        }
+
+        .item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .item-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .item-details {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .item-price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            text-align: right;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #6c757d;
+            font-size: 18px;
+            margin-top: 40px;
+        }
+
+        .empty-state::before {
+            content: "📦";
+            display: block;
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Admin Items Management</h1>
+            <p>Add and manage your items easily</p>
+        </div>
+
+        <div class="add-section">
+            <h2 style="margin-bottom: 20px; color: #333;">Add New Item</h2>
+            <div class="form-group">
+                <label for="itemName">Item Name:</label>
+                <input type="text" id="itemName" placeholder="Enter item name">
+            </div>
+            <div class="form-group">
+                <label for="itemDetails">Item Details:</label>
+                <textarea id="itemDetails" placeholder="Enter item details and description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="itemPrice">Price (Rs):</label>
+                <input type="number" id="itemPrice" placeholder="Enter price in Rs">
+            </div>
+            <button class="add-btn" id="addButton">Add Item</button>
+        </div>
+
+        <div class="search-section">
+            <h2 style="margin-bottom: 20px; color: #333; text-align: center;">Search Items</h2>
+            <div class="search-box">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search items...">
+                <span class="search-icon">🔍</span>
+            </div>
+        </div>
+
+        <div class="items-section">
+            <div id="notFound" class="not-found" style="display: none;">
+                Item not found!
+            </div>
+            <div id="itemsGrid" class="items-grid"></div>
+            <div id="emptyState" class="empty-state">
+                No items added yet. Add your first item above!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let items = [];
+        let filteredItems = [];
+
+        // Load items from localStorage
+        function loadItems() {
+            try {
+                const savedItems = localStorage.getItem('adminItems');
+                if (savedItems) {
+                    items = JSON.parse(savedItems);
+                    filteredItems = [...items];
+                    console.log('Loaded items:', items.length);
+                } else {
+                    console.log('No saved items found');
+                }
+            } catch (error) {
+                console.log('Error loading items:', error);
+                // Fallback to memory storage if localStorage fails
+                items = [];
+                filteredItems = [];
+            }
+        }
+
+        // Save items to localStorage
+        function saveItems() {
+            try {
+                localStorage.setItem('adminItems', JSON.stringify(items));
+                console.log('Items saved to localStorage');
+            } catch (error) {
+                console.log('Error saving items:', error);
+                // Continue without saving if localStorage fails
+            }
+        }
+
+        // Add item function
+        function addItem() {
+            console.log('Add button clicked!');
+            
+            const name = document.getElementById('itemName').value.trim();
+            const details = document.getElementById('itemDetails').value.trim();
+            const price = document.getElementById('itemPrice').value.trim();
+
+            console.log('Values:', name, details, price);
+
+            if (!name || !details || !price) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            if (isNaN(price) || price <= 0) {
+                alert('Please enter a valid price');
+                return;
+            }
+
+            const item = {
+                id: Date.now(),
+                name: name,
+                details: details,
+                price: parseFloat(price)
+            };
+
+            items.push(item);
+            saveItems(); // Save to localStorage
+            console.log('Item added:', item);
+            console.log('Total items:', items.length);
+            
+            // Clear form
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemDetails').value = '';
+            document.getElementById('itemPrice').value = '';
+
+            // Reset search and display all items
+            document.getElementById('searchInput').value = '';
+            filteredItems = [...items];
+            displayItems();
+        }
+
+        // Search function
+        function searchItems() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                filteredItems = [...items];
+            } else {
+                filteredItems = items.filter(item => 
+                    item.name.toLowerCase().includes(searchTerm) || 
+                    item.details.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            displayItems();
+        }
+
+        // Delete function
+        function deleteItem(itemId) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                items = items.filter(item => item.id !== itemId);
+                saveItems(); // Save to localStorage
+                
+                // Update filtered items
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+                if (searchTerm === '') {
+                    filteredItems = [...items];
+                } else {
+                    filteredItems = items.filter(item => 
+                        item.name.toLowerCase().includes(searchTerm) || 
+                        item.details.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                displayItems();
+            }
+        }
+
+        // Display items function
+        function displayItems() {
+            const itemsGrid = document.getElementById('itemsGrid');
+            const notFound = document.getElementById('notFound');
+            const emptyState = document.getElementById('emptyState');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            // Clear previous content
+            itemsGrid.innerHTML = '';
+
+            if (items.length === 0) {
+                // No items at all
+                emptyState.style.display = 'block';
+                notFound.style.display = 'none';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            if (searchTerm && filteredItems.length === 0) {
+                // Search term exists but no results
+                notFound.style.display = 'block';
+            } else {
+                notFound.style.display = 'none';
+            }
+
+            // Always show all items (filtered or full list)
+            const itemsToShow = filteredItems.length > 0 ? filteredItems : items;
+            
+            itemsToShow.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.innerHTML = `
+                    <button class="delete-btn" onclick="deleteItem(${item.id})" title="Delete item">×</button>
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-details">${item.details}</div>
+                    <div class="item-price">Rs ${item.price.toLocaleString()}</div>
+                `;
+                itemsGrid.appendChild(card);
+            });
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded!');
+            
+            // Load saved items first
+            loadItems();
+            
+            // Add button event
+            document.getElementById('addButton').addEventListener('click', addItem);
+            
+            // Search event
+            document.getElementById('searchInput').addEventListener('keyup', searchItems);
+            
+            // Initialize display
+            displayItems();
+        });
+    </script>
+</body>
+</html>
